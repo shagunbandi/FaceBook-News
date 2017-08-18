@@ -10,9 +10,10 @@ import UIKit
 
 class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    let your_token = "you token here"
+    let your_token = "your token"
     
     let pagesURLs = ["ktj.iitkgp","TSG.IITKharagpur","scholarsavenue"]
+//    let pagesURLs = ["ktj.iitkgp"]
     
     var feeds: [Feed]?
     
@@ -37,10 +38,28 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 for page in self.pagesURLs {
                     let pageDict = dictionary[page]
                     let pageInfo = Page()
+                    
+                    // Page URL
                     pageInfo.pageURL = page
-                    pageInfo.title = pageDict?["name"] as? String
+                    
+                    // Page URL
                     let logo = pageDict?["picture"] as! [String:[String:AnyObject]]
                     pageInfo.logo = logo["data"]?["url"] as? String
+                    
+                    // Page Title
+                    if let title = pageDict?["name"] as? String {
+                        let size = CGSize(width: self.view.frame.width - 68 , height: 200)
+                        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+                        let estimatesRect = NSString(string: title).boundingRect(with: size, options: options, attributes:[NSFontAttributeName: UIFont.systemFont(ofSize: 18)], context: nil)
+                        let height = estimatesRect.size.height
+                        pageInfo.title = title
+                        pageInfo.height = height
+//                        print("\(pageInfo.title) - \(pageInfo.height)")
+                    }
+                    else {
+                        pageInfo.height = CGFloat(0)
+                    }
+
                     self.pages?[page] = pageInfo
                 }
             }
@@ -64,27 +83,39 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 print("Got the f&*^)*ing JSON File")
                 let dictionary = json as! [String: AnyObject]
                 self.feeds = [Feed]()
-                self.heights = [CGFloat]()
                 for page in self.pagesURLs {
                     let pageDict = dictionary[page]
                     for dict in pageDict?["data"] as! [[String: AnyObject]] {
                         let feed = Feed()
+                        
+                        // Message
                         feed.message = dict["message"] as? String
                         if let msg = feed.message {
                             let size = CGSize(width: self.view.frame.width - 16 - 16, height: 1000)
                             let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
                             let estimatesRect = NSString(string: msg).boundingRect(with: size, options: options, attributes:[NSFontAttributeName: UIFont.systemFont(ofSize: 18)], context: nil)
                             let height = estimatesRect.size.height
-                            self.heights?.append(height)
                             feed.height = height
                         }
                         else {
-                            self.heights?.append(CGFloat(0))
                             feed.height = CGFloat(0)
                         }
+                        
+                        // Main Image
                         feed.thumbnailImageName = dict["full_picture"] as? String
+
+                        // Date
+                        let timeString = dict["created_time"]! as? String
+                        let deFormatter = DateFormatter()
+                        deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                        feed.date = deFormatter.date(from: timeString!)
+                        
+                        // Page
                         feed.page = (self.pages?[page])!
+                        
                         self.feeds?.append(feed)
+                        self.feeds = self.feeds?.sorted(by: { $0.date! > $1.date! })
+
                     }
                 }
                 print("Reloading Data")
@@ -92,6 +123,8 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
                     self.collectionView?.reloadData()
                 }
                 print("Done")
+                self.setHeights()
+
             }
             catch let jsonError {
                 print(jsonError)
@@ -99,10 +132,24 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             }.resume()
     }
     
+    func setHeights() {
+        heights = [CGFloat]()
+        for feed in self.feeds! {
+//            DispatchQueue.main.async {
+//            }
+            let height = feed.height!
+//            print(height)
+            self.heights?.append(height)
+        }
+//        print("&^*&^(*&^(*&^(*&^(*&^(*&^(*&%*&^$*%$&%^$*&^%*&^%*%$&^%$^%$^%$&^%$")
+//        print(heights!)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchPages()
         fetchFeeds()
+        
         navigationItem.title = "Home"
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(FeedCell.self, forCellWithReuseIdentifier: "cellId")
@@ -149,8 +196,11 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let height = view.frame.width + 72 + 30 + (heights?[indexPath.item])!
-        return CGSize(width: view.frame.width, height: height)
+        if let heightsOfPosts = feeds?[indexPath.item].height {
+            let height = view.frame.width + 72 + 24 + heightsOfPosts
+            return CGSize(width: view.frame.width, height: height)
+        }
+        return CGSize(width: view.frame.width, height: 200)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {

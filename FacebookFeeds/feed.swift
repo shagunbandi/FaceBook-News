@@ -12,6 +12,7 @@ class Page: NSObject {
     var logo: String?
     var pageURL: String?
     var title: String?
+    var height: CGFloat?
 }
 
 class Feed: NSObject {
@@ -19,5 +20,5 @@ class Feed: NSObject {
     var message: String?
     var page = Page()
     var height: CGFloat?
-    
+    var date: Date?
 }

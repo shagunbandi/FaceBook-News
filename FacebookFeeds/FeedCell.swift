@@ -33,15 +33,30 @@ class FeedCell: BaseCell {
             setupThumbnailImage()
             
             //Page Assets
-            if let feedPageURL = feed?.page.pageURL { pageURL.text = feedPageURL }
-            if let pageTitle = feed?.page.title { titleLabel.text = pageTitle }
+            if let feedPageURL = feed?.page.pageURL {
+                pageURL.text = feedPageURL
+            }
+            if let pageTitle = feed?.page.title {
+                titleLabel.text = pageTitle
+                
+                DispatchQueue.main.async {
+                    if (self.feed?.page.height)! > 22 {
+                        self.titleLabelHeightConstraint?.constant = 44
+                        print("Big - \(pageTitle) - \(self.feed?.page.height)")
+                    }
+                    else{
+                        self.titleLabelHeightConstraint?.constant = 20
+                        print("small - \(pageTitle) - \(self.feed?.page.height)")
+                    }
+                }
+            }
             setupPageImage()
             
             //Set Height of Message
             //            print(feed?.height)
             
             DispatchQueue.main.async {
-                self.titleLabelHeightConstraint?.constant = (self.feed?.height)!
+                self.messageHeightConstraint?.constant = (self.feed?.height)!
             }
             
         }
@@ -87,8 +102,7 @@ class FeedCell: BaseCell {
     
     let titleLabel: UILabel = {
         let label = UILabel()
-        //        label.backgroundColor = UIColor.purple
-        label.text = "Kshitij, IIT Kharagpur"
+        label.text = "Shagun Bandi"
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 2
         return label
@@ -105,7 +119,7 @@ class FeedCell: BaseCell {
     
     let pageURL: UITextView = {
         let textView = UITextView()
-        textView.text = "@ktj.iitkgp"
+        textView.text = "@shagunbandi"
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.textContainerInset = UIEdgeInsetsMake(0, -4, 0, 0)
         textView.textColor = UIColor.lightGray
@@ -113,6 +127,7 @@ class FeedCell: BaseCell {
     }()
     
     var titleLabelHeightConstraint: NSLayoutConstraint?
+    var messageHeightConstraint: NSLayoutConstraint?
     
     override func setupViews() {
         addSubview(thumbnailImageView)
@@ -129,7 +144,8 @@ class FeedCell: BaseCell {
         
         
         //Vertical Constrains
-        addConstrainsWithFormat(format: "V:|-16-[v0(44)]-16-[v1]-8-[v2]-16-[v3(1)]|", views: userProfileImageView, thumbnailImageView, message, seperatorView)
+        addConstrainsWithFormat(format: "V:|-16-[v0(44)]", views: userProfileImageView)
+        addConstrainsWithFormat(format: "V:[v0(1)]|", views: seperatorView)
         
         
         
@@ -142,7 +158,8 @@ class FeedCell: BaseCell {
         //right Constraint
         addConstraint(NSLayoutConstraint(item: titleLabel, attribute: .right, relatedBy: .equal, toItem: thumbnailImageView, attribute: .right, multiplier: 1, constant: 0))
         //height Contrait
-        addConstraint(NSLayoutConstraint(item: titleLabel, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 0, constant: 20))
+        titleLabelHeightConstraint = NSLayoutConstraint(item: titleLabel, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 0, constant: 20)
+        addConstraint(titleLabelHeightConstraint!)
         
         
         // page URL Label Contrains
@@ -165,8 +182,8 @@ class FeedCell: BaseCell {
         //top Constraint
         addConstraint(NSLayoutConstraint(item: message, attribute: .top, relatedBy: .equal, toItem: thumbnailImageView, attribute: .bottom, multiplier: 1, constant: 8))
         //height Constraint
-        titleLabelHeightConstraint = NSLayoutConstraint(item: message, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 10)
-        addConstraint(titleLabelHeightConstraint!)
+        messageHeightConstraint = NSLayoutConstraint(item: message, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 10)
+        addConstraint(messageHeightConstraint!)
     }
     
 }
