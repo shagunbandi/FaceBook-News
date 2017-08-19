@@ -39,6 +39,10 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
         return 3
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print(indexPath.item)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! MenuCell
         cell.imageView.image = UIImage(named: imageNames[indexPath.item])?.withRenderingMode(.alwaysTemplate)
@@ -76,8 +80,10 @@ class MenuCell: BaseCell {
     
     override var isSelected: Bool {
         didSet {
-            self.backgroundColor = isSelected ? UIColor(red: 0/255, green: 102/255, blue: 0/255, alpha: 1): UIColor(red: 0/255, green: 52/255, blue: 0/255, alpha: 1)
-            imageView.tintColor = isSelected ? UIColor.white : UIColor(red: 0/255, green: 102/255, blue: 0/255, alpha: 1)
+            UIView.animate(withDuration: 0.1) {
+                self.backgroundColor = self.isSelected ? UIColor(red: 0/255, green: 102/255, blue: 0/255, alpha: 1): UIColor(red: 0/255, green: 52/255, blue: 0/255, alpha: 1)
+                self.imageView.tintColor = self.isSelected ? UIColor.white : UIColor(red: 0/255, green: 102/255, blue: 0/255, alpha: 1)
+            }
         }
     }
     

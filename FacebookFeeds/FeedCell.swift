@@ -42,11 +42,11 @@ class FeedCell: BaseCell {
                 DispatchQueue.main.async {
                     if (self.feed?.page.height)! > 22 {
                         self.titleLabelHeightConstraint?.constant = 44
-                        print("Big - \(pageTitle) - \(self.feed?.page.height)")
+//                        print("Big - \(pageTitle) - \(self.feed?.page.height)")
                     }
                     else{
                         self.titleLabelHeightConstraint?.constant = 20
-                        print("small - \(pageTitle) - \(self.feed?.page.height)")
+//                        print("small - \(pageTitle) - \(self.feed?.page.height)")
                     }
                 }
             }

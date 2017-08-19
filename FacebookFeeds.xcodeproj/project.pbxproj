@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A70CA91A1F486BBB00F66094 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70CA9191F486BBB00F66094 /* ApiService.swift */; };
 		A77C22C51F4734B500C45B1C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C22C41F4734B500C45B1C /* AppDelegate.swift */; };
 		A77C22CA1F4734B500C45B1C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A77C22C81F4734B500C45B1C /* Main.storyboard */; };
 		A77C22CC1F4734B500C45B1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A77C22CB1F4734B500C45B1C /* Assets.xcassets */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A70CA9191F486BBB00F66094 /* ApiService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
 		A77C22C11F4734B500C45B1C /* FacebookFeeds.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FacebookFeeds.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A77C22C41F4734B500C45B1C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A77C22C91F4734B500C45B1C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -43,6 +45,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A70CA9181F486B7300F66094 /* ApiService */ = {
+			isa = PBXGroup;
+			children = (
+				A70CA9191F486BBB00F66094 /* ApiService.swift */,
+			);
+			name = ApiService;
+			sourceTree = "<group>";
+		};
 		A77C22B81F4734B500C45B1C = {
 			isa = PBXGroup;
 			children = (
@@ -62,6 +72,7 @@
 		A77C22C31F4734B500C45B1C /* FacebookFeeds */ = {
 			isa = PBXGroup;
 			children = (
+				A70CA9181F486B7300F66094 /* ApiService */,
 				A77C22D61F47350000C45B1C /* Model */,
 				A77C22D91F47352800C45B1C /* View */,
 				A77C22DE1F47357000C45B1C /* Controller */,
@@ -186,6 +197,7 @@
 				A77C22E31F4735D500C45B1C /* extensions.swift in Sources */,
 				A77C22C51F4734B500C45B1C /* AppDelegate.swift in Sources */,
 				A77C22DD1F47354B00C45B1C /* MenuBar.swift in Sources */,
+				A70CA91A1F486BBB00F66094 /* ApiService.swift in Sources */,
 				A77C22E01F47358500C45B1C /* HomeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
