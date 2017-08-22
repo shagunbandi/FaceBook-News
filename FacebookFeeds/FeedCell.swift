@@ -42,19 +42,13 @@ class FeedCell: BaseCell {
                 DispatchQueue.main.async {
                     if (self.feed?.page.height)! > 22 {
                         self.titleLabelHeightConstraint?.constant = 44
-//                        print("Big - \(pageTitle) - \(self.feed?.page.height)")
                     }
                     else{
                         self.titleLabelHeightConstraint?.constant = 20
-//                        print("small - \(pageTitle) - \(self.feed?.page.height)")
                     }
                 }
             }
             setupPageImage()
-            
-            //Set Height of Message
-            //            print(feed?.height)
-            
             DispatchQueue.main.async {
                 self.messageHeightConstraint?.constant = (self.feed?.height)!
             }
@@ -94,12 +88,37 @@ class FeedCell: BaseCell {
         return imageView
     }()
     
+    var starred = false
+    
+    lazy var favoriteButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(named: "star")
+        button.setImage(image, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .red
+        button.alpha = 0.1
+        button.addTarget(self, action: #selector(handleStar), for: .touchUpInside)
+        return button
+    }()
+    
+    func handleStar() {
+        if starred {
+            favoriteButton.alpha = 0.1
+            starred = false
+            print("deselect")
+        } else {
+            favoriteButton.alpha = 1
+            starred = true
+            print("select")
+        }
+    }
+    
     let seperatorView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1)
         return view
     }()
-    
+
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Shagun Bandi"
@@ -136,18 +155,16 @@ class FeedCell: BaseCell {
         addSubview(titleLabel)
         addSubview(pageURL)
         addSubview(message)
+        addSubview(favoriteButton)
         
         addConstrainsWithFormat(format: "H:|-16-[v0]-16-|", views: thumbnailImageView)
-        addConstrainsWithFormat(format: "H:|-16-[v0(44)]", views: userProfileImageView)
+        addConstrainsWithFormat(format: "H:|-16-[v0(44)]-8-[v1]-46-|", views: userProfileImageView, titleLabel)
         addConstrainsWithFormat(format: "H:|[v0]|", views: seperatorView)
         addConstrainsWithFormat(format: "H:|-16-[v0]-16-|", views: message)
-        
         
         //Vertical Constrains
         addConstrainsWithFormat(format: "V:|-16-[v0(44)]", views: userProfileImageView)
         addConstrainsWithFormat(format: "V:[v0(1)]|", views: seperatorView)
-        
-        
         
         
         // Title Label Contrains
@@ -155,8 +172,8 @@ class FeedCell: BaseCell {
         addConstraint(NSLayoutConstraint(item: titleLabel, attribute: .top, relatedBy: .equal, toItem: userProfileImageView, attribute: .top, multiplier: 1, constant: 0))
         //left Constraint
         addConstraint(NSLayoutConstraint(item: titleLabel, attribute: .left, relatedBy: .equal, toItem: userProfileImageView, attribute: .right, multiplier: 1, constant: 8))
-        //right Constraint
-        addConstraint(NSLayoutConstraint(item: titleLabel, attribute: .right, relatedBy: .equal, toItem: thumbnailImageView, attribute: .right, multiplier: 1, constant: 0))
+//        //right Constraint
+//        addConstraint(NSLayoutConstraint(item: titleLabel, attribute: .right, relatedBy: .equal, toItem: favoriteButtonSelect, attribute: .left, multiplier: 1, constant: 8))
         //height Contrait
         titleLabelHeightConstraint = NSLayoutConstraint(item: titleLabel, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 0, constant: 20)
         addConstraint(titleLabelHeightConstraint!)
@@ -184,6 +201,16 @@ class FeedCell: BaseCell {
         //height Constraint
         messageHeightConstraint = NSLayoutConstraint(item: message, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 10)
         addConstraint(messageHeightConstraint!)
+        
+        // star Constraint
+        // width
+        favoriteButton.widthAnchor.constraint(equalToConstant: 22).isActive = true
+        // height
+        favoriteButton.heightAnchor.constraint(equalToConstant: 22).isActive = true
+        // right
+        favoriteButton.rightAnchor.constraint(equalTo: thumbnailImageView.rightAnchor).isActive = true
+        //top
+        favoriteButton.topAnchor.constraint(equalTo: userProfileImageView.topAnchor).isActive = true
     }
     
 }

@@ -20,7 +20,7 @@ class ApiService: NSObject {
     
     func fetchFeeds( completion: @escaping ([Feed]) -> () ) {
 
-        let u = "https://graph.facebook.com/posts?ids="+self.pagesURLs.joined(separator: ",")+"&limit=6&fields=message,id,full_picture,picture,created_time&access_token=\(your_token)"
+        let u = "https://graph.facebook.com/posts?ids="+self.pagesURLs.joined(separator: ",")+"&limit=1&fields=message,id,full_picture,picture,created_time&access_token=\(your_token)"
         let urlStr: String = u.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         let searchURL = URL(string: urlStr as String)!
         

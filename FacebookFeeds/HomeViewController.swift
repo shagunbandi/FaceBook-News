@@ -8,38 +8,39 @@
 
 import UIKit
 
+let favorites = ["1"]
+
 class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    var feeds: [Feed]?
     
-    func fetchPages() {
-        ApiService.sharedInstance.fetchPages()
-    }
-    
-    func fetchFeeds() {
-        ApiService.sharedInstance.fetchFeeds { (feeds: [Feed]) in
-            self.feeds = feeds
-            self.collectionView?.reloadData()
-        }
-    }
-    
+    let cellId = "cellId"
+    let favoriteId = "favoriteId"
+            
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        fetchPages()
-        fetchFeeds()
-        
+
         navigationItem.title = "Home"
-        collectionView?.backgroundColor = UIColor.white
-        collectionView?.register(FeedCell.self, forCellWithReuseIdentifier: "cellId")
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-        collectionView?.contentInset = UIEdgeInsetsMake(0, 0, 50, 0)
-        collectionView?.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, 50, 0)
         
-        
-        
+        setupCollectionView()
         setupMenuBar()
         setupNavBarButtons()
+    }
+    
+    func setupCollectionView() {
+        if let flowlayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowlayout.scrollDirection = .horizontal
+            flowlayout.minimumLineSpacing = 0
+        }
+        collectionView?.backgroundColor = UIColor.white
+        collectionView?.register(Feeds.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.register(Favorites.self, forCellWithReuseIdentifier: favoriteId)
+        collectionView?.contentInset = UIEdgeInsetsMake(100, 0, 150, 0)
+        
+        // Bug with the collectionView Size Ep13 13min
+        collectionView?.scrollIndicatorInsets = UIEdgeInsetsMake(100, 0, 150, 0)
+        
+        collectionView?.isPagingEnabled = true
     }
     
     func setupNavBarButtons() {
@@ -49,19 +50,22 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     func handleSearch() {
-        print(123)
+        scrollToMenuAtIndexPath(menuIndex: 2)
     }
     
-    let menuBar: MenuBar = {
+    func scrollToMenuAtIndexPath(menuIndex: Int) {
+        let indexPath = IndexPath(item: menuIndex, section: 0)
+        collectionView?.scrollToItem(at: indexPath, at: .left, animated: true)
+        setTitleForIndex(index: menuIndex)
+    }
+    
+    lazy var menuBar: MenuBar = {
         let mb = MenuBar()
+        mb.homeController = self
         return mb
     }()
     
     private func setupMenuBar() {
-        
-//        Solve this bug
-//        navigationController?.hidesBarsOnSwipe = true
-
         view.addSubview(menuBar)
         view.addConstrainsWithFormat(format: "H:|[v0]|", views: menuBar)
         view.addConstrainsWithFormat(format: "V:[v0(50)]|", views: menuBar)
@@ -69,26 +73,35 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return feeds?.count ?? 0
+        return 3
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cellId", for: indexPath) as! FeedCell
-        cell.backgroundColor = UIColor.white
-        cell.feed = feeds?[indexPath.item]
+        if indexPath.item == 1 {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: favoriteId, for: indexPath)
+        }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if let heightsOfPosts = feeds?[indexPath.item].height {
-            let height = view.frame.width + 72 + 50 + heightsOfPosts
-            return CGSize(width: view.frame.width, height: height)
-        }
-        return CGSize(width: view.frame.width, height: 200)
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+    let titles = ["Home", "Favorites", "Profile"]
+    
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let index = targetContentOffset.pointee.x / view.frame.width
+        let indexPath = IndexPath(item: Int(index), section: 0)
+        menuBar.collectionView.selectItem(at: indexPath as IndexPath, animated: false, scrollPosition: .left)
+        setTitleForIndex(index: Int(index))
+    }
+    
+    func setTitleForIndex(index: Int) {
+        navigationItem.title = titles[Int(index)]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: view.frame.width, height: view.frame.height - 100)
     }
 }
 
