@@ -9,10 +9,12 @@
 import UIKit
 
 class Page: NSObject {
+    var id: String?
     var logo: String?
     var pageURL: String?
     var title: String?
     var height: CGFloat?
+    var feedsLinked: [String]?
 }
 
 class Feed: NSObject {
@@ -21,4 +23,6 @@ class Feed: NSObject {
     var page = Page()
     var height: CGFloat?
     var date: Date?
+    var id: String?
+    var isFav: Bool?
 }

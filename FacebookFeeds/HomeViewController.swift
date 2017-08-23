@@ -8,10 +8,11 @@
 
 import UIKit
 
-let favorites = ["1"]
+struct StarID {
+    static var starIds: [String] = []
+}
 
 class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-    
     
     let cellId = "cellId"
     let favoriteId = "favoriteId"
@@ -25,6 +26,20 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         setupCollectionView()
         setupMenuBar()
         setupNavBarButtons()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        loadFavFeedsIds()
+    }
+    
+    func loadFavFeedsIds() {
+        if let favFeeds = UserDefaults.standard.object(forKey: "Favs") as? [String] {
+            for feedIds in favFeeds {
+                StarID.starIds.append(feedIds)
+            }
+        } else {
+            UserDefaults.standard.set([], forKey: "Favs")
+        }
     }
     
     func setupCollectionView() {

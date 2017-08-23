@@ -39,6 +39,14 @@ class ApiService: NSObject {
                     for dict in pageDict?["data"] as! [[String: AnyObject]] {
                         let feed = Feed()
                         
+                        feed.id = dict["id"] as? String
+                        print(StarID.starIds)
+                        if StarID.starIds.contains(feed.id!) {
+                            feed.isFav = true
+                        } else {
+                            feed.isFav = false
+                        }
+                        
                         // Message
                         feed.message = dict["message"] as? String
                         if let msg = feed.message {
@@ -82,6 +90,80 @@ class ApiService: NSObject {
             }.resume()
     }
     
+    
+    func fetchFavFeeds( completion: @escaping ([Feed]) -> () ) {
+        
+        let u = "https://graph.facebook.com/?ids=\(StarID.starIds.joined(separator: ","))&fields=from,message,id,full_picture,picture,created_time&access_token=\(your_token)"
+        let urlStr: String = u.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        let searchURL = URL(string: urlStr as String)!
+        
+        URLSession.shared.dataTask(with: searchURL as URL) { (data, response, error) in
+            if error != nil {
+                print("Error in fetching Data")
+                return
+            }
+            do {
+                let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers)
+                print("Got the f&*^)*ing JSON File")
+                let dictionary = json as! [String: AnyObject]
+                var feeds = [Feed]()
+                for id in StarID.starIds {
+                    let idDict = dictionary[id] as! [String: AnyObject]
+                    
+                    let feed = Feed()
+                    
+                    // Feed Id
+                    feed.id = idDict["id"] as? String
+                    
+                    // Starred
+                    if StarID.starIds.contains(feed.id!) {
+                        feed.isFav = true
+                    } else {
+                        feed.isFav = false
+                    }
+                    
+                    // Message
+                    feed.message = idDict["message"] as? String
+                    if let msg = feed.message {
+                        let size = CGSize(width: UIScreen.main.bounds.size.width - 16 - 16, height: 1000)
+                        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+                        let estimatesRect = NSString(string: msg).boundingRect(with: size, options: options, attributes:[NSFontAttributeName: UIFont.systemFont(ofSize: 18)], context: nil)
+                        let height = estimatesRect.size.height
+                        feed.height = height
+                    }
+                    else {
+                        feed.height = CGFloat(0)
+                    }
+                    
+                    // Main Image
+                    feed.thumbnailImageName = idDict["full_picture"] as? String
+                    
+                    // Date
+                    let timeString = idDict["created_time"]! as? String
+                    let deFormatter = DateFormatter()
+                    deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                    feed.date = deFormatter.date(from: timeString!)
+                    
+                    // Page
+                    let pageID = idDict["from"]?["id"] as? String
+                    feed.page = (self.pages?[pageID!])!
+                    
+                    feeds.append(feed)
+                    feeds = feeds.sorted(by: { $0.date! > $1.date! })
+                }
+                print("Reloading Data")
+                DispatchQueue.main.async {
+                    completion(feeds)
+                }
+                print("Done")
+                
+            }
+            catch let jsonError {
+                print(jsonError)
+            }
+            }.resume()
+    }
+    
     func fetchPages() {
         let u = "https://graph.facebook.com/?ids="+self.pagesURLs.joined(separator: ",")+"&fields=picture{url},name,id&access_token=\(your_token)"
         let urlStr: String = u.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
@@ -100,10 +182,13 @@ class ApiService: NSObject {
                     let pageDict = dictionary[page]
                     let pageInfo = Page()
                     
+                    // Page Id
+                    pageInfo.id = pageDict?["id"] as? String
+                    
                     // Page URL
                     pageInfo.pageURL = page
                     
-                    // Page URL
+                    // Page Logo
                     let logo = pageDict?["picture"] as! [String:[String:AnyObject]]
                     pageInfo.logo = logo["data"]?["url"] as? String
                     
@@ -121,6 +206,7 @@ class ApiService: NSObject {
                     }
                     
                     self.pages?[page] = pageInfo
+                    self.pages?[pageInfo.id!] = pageInfo
                 }
             }
             catch let jsonError {

@@ -11,7 +11,10 @@ import UIKit
 class Favorites: Feeds {
     
     override func fetchFeeds() {
-        
+        ApiService.sharedInstance.fetchFavFeeds { (feeds: [Feed]) in
+            self.feeds = feeds
+            self.collectionView.reloadData()
+        }
     }
     
 }

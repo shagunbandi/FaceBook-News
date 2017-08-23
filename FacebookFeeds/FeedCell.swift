@@ -31,6 +31,13 @@ class FeedCell: BaseCell {
             //Feed Assets
             message.text = feed?.message
             setupThumbnailImage()
+            if (feed?.isFav)! {
+                favoriteButton.alpha = 1
+                starred = true
+            } else {
+                favoriteButton.alpha = 0.1
+                starred = false
+            }
             
             //Page Assets
             if let feedPageURL = feed?.page.pageURL {
@@ -71,7 +78,7 @@ class FeedCell: BaseCell {
     let thumbnailImageView: CustomImageView = {
         let imageView = CustomImageView()
         imageView.backgroundColor = UIColor.black
-        imageView.image = UIImage(named: "KTJArticle")
+//        imageView.image = UIImage(named: "KTJArticle")
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -80,7 +87,7 @@ class FeedCell: BaseCell {
     let userProfileImageView: CustomImageView = {
         let imageView = CustomImageView()
         imageView.backgroundColor = UIColor.green
-        imageView.image = UIImage(named: "ktj")
+//        imageView.image = UIImage(named: "ktj")
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 22
@@ -105,11 +112,25 @@ class FeedCell: BaseCell {
         if starred {
             favoriteButton.alpha = 0.1
             starred = false
-            print("deselect")
+            self.feed?.isFav = false
+            let id = self.feed?.id
+            StarID.starIds = StarID.starIds.filter { $0 != id }
+            
+            if var favFeeds = UserDefaults.standard.object(forKey: "Favs") as? [String] {
+                favFeeds = favFeeds.filter { $0 != id }
+                UserDefaults.standard.set(favFeeds, forKey: "Favs")
+            }
         } else {
             favoriteButton.alpha = 1
             starred = true
-            print("select")
+            feed?.isFav = true
+            let id = self.feed?.id
+            StarID.starIds.append(id!)
+            
+            if var favFeeds = UserDefaults.standard.object(forKey: "Favs") as? [String] {
+                favFeeds.append(id!)
+                UserDefaults.standard.set(favFeeds, forKey: "Favs")
+            }
         }
     }
     
@@ -121,7 +142,7 @@ class FeedCell: BaseCell {
 
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Shagun Bandi"
+//        label.text = "Shagun Bandi"
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 2
         return label
@@ -138,7 +159,7 @@ class FeedCell: BaseCell {
     
     let pageURL: UITextView = {
         let textView = UITextView()
-        textView.text = "@shagunbandi"
+//        textView.text = "@shagunbandi"
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.textContainerInset = UIEdgeInsetsMake(0, -4, 0, 0)
         textView.textColor = UIColor.lightGray
