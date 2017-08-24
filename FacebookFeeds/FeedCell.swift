@@ -170,6 +170,10 @@ class FeedCell: BaseCell {
     var messageHeightConstraint: NSLayoutConstraint?
     
     override func setupViews() {
+        
+        backgroundColor = .white
+
+        
         addSubview(thumbnailImageView)
         addSubview(userProfileImageView)
         addSubview(seperatorView)

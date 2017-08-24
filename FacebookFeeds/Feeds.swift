@@ -22,6 +22,8 @@ class Feeds: BaseCell, UICollectionViewDataSource, UICollectionViewDelegate, UIC
     
     let cellId = "cellId"
     
+    var refreshControl = UIRefreshControl()
+    
     func fetchPages() {
         ApiService.sharedInstance.fetchPages()
     }
@@ -33,8 +35,25 @@ class Feeds: BaseCell, UICollectionViewDataSource, UICollectionViewDelegate, UIC
         }
     }
     
+    func refreshStream() {
+        
+        print("refresh")
+        fetchPages()
+        fetchFeeds()
+//        collectionView.reloadData()
+        refreshControl.endRefreshing()
+    }
+    
     override func setupViews() {
         
+        // Refresher
+        collectionView.alwaysBounceVertical = true
+        let refresher = UIRefreshControl()
+        refresher.addTarget(self, action: #selector(refreshStream), for: .valueChanged)
+        refreshControl = refresher
+        collectionView.addSubview(refreshControl)
+
+        // Fetch Feeds
         fetchPages()
         fetchFeeds()
         
