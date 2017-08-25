@@ -38,7 +38,7 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -49,12 +49,12 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! MenuCell
         cell.imageView.image = UIImage(named: imageNames[indexPath.item])?.withRenderingMode(.alwaysTemplate)
-        cell.tintColor = UIColor(red: 0/255, green: 102/255, blue: 0/255, alpha: 1)
+        cell.tintColor = UIColor(red: 0/255, green: 102/255, blue: 0/255, alpha: 0)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: frame.width/3, height: frame.height)
+        return CGSize(width: frame.width/2, height: frame.height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

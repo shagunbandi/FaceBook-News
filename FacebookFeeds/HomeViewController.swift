@@ -10,6 +10,7 @@ import UIKit
 
 struct StarID {
     static var starIds: [String] = []
+    static var pageUrls: [String] = []
 }
 
 class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
@@ -36,12 +37,19 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     func loadFavFeedsIds() {
         if let favFeeds = UserDefaults.standard.object(forKey: "Favs") as? [String] {
-            for feedIds in favFeeds {
-                StarID.starIds.append(feedIds)
-            }
+            print(favFeeds)
+            StarID.starIds = favFeeds
         } else {
             UserDefaults.standard.set([], forKey: "Favs")
         }
+        
+        if let favFeedsPageUrls = UserDefaults.standard.object(forKey: "FavsPageUrl") as? [String] {
+            print(favFeedsPageUrls)
+            StarID.pageUrls = favFeedsPageUrls
+        } else {
+            UserDefaults.standard.set([], forKey: "FavsPageUrl")
+        }
+        
     }
     
     func setupCollectionView() {
@@ -52,18 +60,18 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(Feeds.self, forCellWithReuseIdentifier: cellId)
         collectionView?.register(Favorites.self, forCellWithReuseIdentifier: favoriteId)
-        collectionView?.contentInset = UIEdgeInsetsMake(100, 0, 150, 0)
+        collectionView?.contentInset = UIEdgeInsetsMake(40, 0, 90, 0)
         
         // Bug with the collectionView Size Ep13 13min
-        collectionView?.scrollIndicatorInsets = UIEdgeInsetsMake(100, 0, 150, 0)
+        collectionView?.scrollIndicatorInsets = UIEdgeInsetsMake(40, 0, 50, 0)
         
         collectionView?.isPagingEnabled = true
     }
     
     func setupNavBarButtons() {
-        let searchImage = UIImage(named: "Search")?.withRenderingMode(.alwaysOriginal)
-        let searchBarButton = UIBarButtonItem(image: searchImage, style: .plain, target: self, action: #selector(handleSearch))
-        navigationItem.rightBarButtonItems = [searchBarButton]
+//        let searchImage = UIImage(named: "Search")?.withRenderingMode(.alwaysOriginal)
+//        let searchBarButton = UIBarButtonItem(image: searchImage, style: .plain, target: self, action: #selector(handleSearch))
+//        navigationItem.rightBarButtonItems = [searchBarButton]
     }
     
     func handleSearch() {
@@ -90,7 +98,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

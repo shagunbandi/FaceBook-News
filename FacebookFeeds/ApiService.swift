@@ -14,13 +14,19 @@ class ApiService: NSObject {
     
     let your_token = ""
     
-    let pagesURLs = ["ktj.iitkgp","TSG.IITKharagpur","scholarsavenue"]
+//    var pagesURLs = ["ktj.iitkgp","TSG.IITKharagpur","scholarsavenue"]
+    var pagesURLs = ["ktj.iitkgp"]
+    
+    var allPageUrls = [String]()
     
     var pages: [String: Page]?
     
     func fetchFeeds( completion: @escaping ([Feed]) -> () ) {
 
-        let u = "https://graph.facebook.com/posts?ids="+self.pagesURLs.joined(separator: ",")+"&limit=1&fields=message,id,full_picture,picture,created_time&access_token=\(your_token)"
+        let daysInUNIXtime = 60 * 60 * 24
+        let Days5 = Int(NSDate().timeIntervalSince1970) - 2 * daysInUNIXtime
+        
+        let u = "https://graph.facebook.com/posts?ids=\(self.pagesURLs.joined(separator: ","))&since=\(Days5)&fields=message,id,full_picture,picture,created_time&access_token=\(your_token)"
         let urlStr: String = u.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         let searchURL = URL(string: urlStr as String)!
         
@@ -40,7 +46,6 @@ class ApiService: NSObject {
                         let feed = Feed()
                         
                         feed.id = dict["id"] as? String
-                        print(StarID.starIds)
                         if StarID.starIds.contains(feed.id!) {
                             feed.isFav = true
                         } else {
@@ -71,6 +76,7 @@ class ApiService: NSObject {
                         
                         // Page
                         feed.page = (self.pages?[page])!
+                        feed.pageURL = page
                         
                         feeds.append(feed)
                         feeds = feeds.sorted(by: { $0.date! > $1.date! })
@@ -94,6 +100,13 @@ class ApiService: NSObject {
     func fetchFavFeeds( completion: @escaping ([Feed]) -> () ) {
         
         let u = "https://graph.facebook.com/?ids=\(StarID.starIds.joined(separator: ","))&fields=from,message,id,full_picture,picture,created_time&access_token=\(your_token)"
+        
+        
+//        print(u)
+//        print(StarID.starIds)
+//        print(StarID.pageUrls)
+//        print(self.pages)
+        
         let urlStr: String = u.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         let searchURL = URL(string: urlStr as String)!
         
@@ -146,6 +159,7 @@ class ApiService: NSObject {
                     
                     // Page
                     let pageID = idDict["from"]?["id"] as? String
+//                    print(pageID)
                     feed.page = (self.pages?[pageID!])!
                     
                     feeds.append(feed)
@@ -165,7 +179,18 @@ class ApiService: NSObject {
     }
     
     func fetchPages() {
-        let u = "https://graph.facebook.com/?ids="+self.pagesURLs.joined(separator: ",")+"&fields=picture{url},name,id&access_token=\(your_token)"
+        
+        self.allPageUrls = pagesURLs
+        
+        if let favFeedsPageUrls = UserDefaults.standard.object(forKey: "FavsPageUrl") as? [String] {
+            for pageUrls in favFeedsPageUrls {
+                if !self.allPageUrls.contains(pageUrls) {
+                    self.allPageUrls.append(pageUrls)
+                }
+            }
+        }
+        
+        let u = "https://graph.facebook.com/?ids="+self.allPageUrls.joined(separator: ",")+"&fields=picture{url},name,id&access_token=\(your_token)"
         let urlStr: String = u.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         let searchURL = URL(string: urlStr as String)!
         URLSession.shared.dataTask(with: searchURL as URL) { (data, response, error) in
@@ -178,7 +203,7 @@ class ApiService: NSObject {
                 print("Got the f&*^)*ing JSON File")
                 let dictionary = json as! [String: AnyObject]
                 self.pages = [String: Page]()
-                for page in self.pagesURLs {
+                for page in self.allPageUrls {
                     let pageDict = dictionary[page]
                     let pageInfo = Page()
                     

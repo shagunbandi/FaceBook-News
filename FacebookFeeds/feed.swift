@@ -21,6 +21,7 @@ class Feed: NSObject {
     var thumbnailImageName: String?
     var message: String?
     var page = Page()
+    var pageURL: String?
     var height: CGFloat?
     var date: Date?
     var id: String?

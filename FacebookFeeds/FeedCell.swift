@@ -131,6 +131,10 @@ class FeedCell: BaseCell {
                 favFeeds.append(id!)
                 UserDefaults.standard.set(favFeeds, forKey: "Favs")
             }
+            if var favFeedsPageUrl = UserDefaults.standard.object(forKey: "FavsPageUrl") as? [String] {
+                favFeedsPageUrl.append((feed?.pageURL)!)
+                UserDefaults.standard.set(favFeedsPageUrl, forKey: "FavsPageUrl")
+            }
         }
     }
     
@@ -171,8 +175,9 @@ class FeedCell: BaseCell {
     
     override func setupViews() {
         
+//        collectionView.reloadData()
+        
         backgroundColor = .white
-
         
         addSubview(thumbnailImageView)
         addSubview(userProfileImageView)
